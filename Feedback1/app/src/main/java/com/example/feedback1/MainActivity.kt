@@ -1,5 +1,12 @@
 package com.example.feedback1
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,14 +21,42 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NovelaApp()
         }
+
+        NotificationUtils.createNotificationChannel(this)
+        scheduleJob()
+        scheduleAlarm()
     }
-}
+
+    private fun scheduleAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setInexactRepeating(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            System.currentTimeMillis(),
+            AlarmManager.INTERVAL_HALF_HOUR,
+            pendingIntent
+        )
+    }
+
+    private fun scheduleJob() {
+        val componentName = ComponentName(this, SyncJobService::class.java)
+        val jobInfo = JobInfo.Builder(1, componentName)
+            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+            .setPersisted(true)
+            .setPeriodic(15 * 60 * 1000) // 15 minutes
+            .build()
+
+        val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobScheduler.schedule(jobInfo)
+    }}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
