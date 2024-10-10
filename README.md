@@ -1,4 +1,5 @@
 # Cuaderno de Bitácora: Feedback 2 NOVELAS
+Enlace al repositorio: https://github.com/dsousa034/Feedback2.git (La carpeta pome Feedback1 ya que está hecho sobre el primer Feedback el cual se ha mejorado para que funcione correctamente)
 
 ## Descripción del Proyecto
 
